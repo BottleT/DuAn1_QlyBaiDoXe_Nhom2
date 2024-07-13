@@ -1,4 +1,4 @@
-use DuAn1_QuanLyBaiDoXe_Nhom2;
+USE DuAn1_QuanLyBaiDoXe_Nhom2;
 
 -- Tạo bảng BaiDoXe
 CREATE TABLE BaiDoXe (
@@ -108,8 +108,36 @@ CREATE TABLE ApDungGiamGia (
     FOREIGN KEY (MaThanhToan) REFERENCES ThanhToan(MaThanhToan)
 );
 
+-- Tạo bảng TaiKhoan
+CREATE TABLE TaiKhoan (
+    MaTaiKhoan INT IDENTITY(1,1) PRIMARY KEY,
+    MaNhanVien INT,
+    TenDangNhap VARCHAR(50) NOT NULL,
+    MatKhau VARCHAR(50) NOT NULL,
+    LoaiNguoiDung VARCHAR(20) CHECK (LoaiNguoiDung IN ('NhanVien', 'QuanLy')),
+    Email VARCHAR(100),
+    SoDienThoai VARCHAR(15) NOT NULL,
+    FOREIGN KEY (MaNhanVien) REFERENCES NhanVien(MaNhanVien)
+);
+
+-- Tạo ràng buộc kiểm tra cho số điện thoại
+ALTER TABLE TaiKhoan
+ADD CONSTRAINT CHK_SoDienThoai_VietNam 
+CHECK (
+    -- Số điện thoại bắt đầu bằng '0' hoặc '+84'
+    (SoDienThoai LIKE '0%' OR SoDienThoai LIKE '+84%') 
+    AND
+    -- Độ dài từ 10 đến 11 ký tự (loại bỏ ký tự '+')
+    LEN(REPLACE(SoDienThoai, '+', '')) BETWEEN 10 AND 11
+);
+
+-- Tạo ràng buộc kiểm tra cho email
+ALTER TABLE TaiKhoan
+ADD CONSTRAINT CHK_Email_Format 
+CHECK (Email LIKE '%@%.%' AND LEN(Email) <= 100);
+
 -- Chèn dữ liệu vào bảng BaiDoXe
-INSERT INTO BaiDoXe  VALUES
+INSERT INTO BaiDoXe (TenBaiDo, ViTri, TongSoCho, SoChoConLai) VALUES
 ('Bãi A', '123 Đường ABC', 100, 50),
 ('Bãi B', '456 Đường DEF', 150, 75),
 ('Bãi C', '789 Đường GHI', 200, 100),
@@ -122,7 +150,7 @@ INSERT INTO BaiDoXe  VALUES
 ('Bãi J', '189 Đường BCD', 550, 275);
 
 -- Chèn dữ liệu vào bảng ChoDoXe
-INSERT INTO ChoDoXe  VALUES
+INSERT INTO ChoDoXe (MaBaiDo, SoCho, CoXe, LoaiCho) VALUES
 (1, 'A1', 0, 'Xe máy'),
 (1, 'A2', 1, 'Xe máy'),
 (2, 'B1', 0, 'Xe ô tô'),
@@ -135,7 +163,7 @@ INSERT INTO ChoDoXe  VALUES
 (5, 'E2', 1, 'Xe ô tô');
 
 -- Chèn dữ liệu vào bảng ChuSoHuu
-INSERT INTO ChuSoHuu  VALUES
+INSERT INTO ChuSoHuu (TenChuSoHuu, SoDienThoai, Email, DiaChi) VALUES
 ('Nguyen Van A', '0901234567', 'a@example.com', '123 Đường ABC'),
 ('Le Thi B', '0902345678', 'b@example.com', '456 Đường DEF'),
 ('Tran Van C', '0903456789', 'c@example.com', '789 Đường GHI'),
@@ -148,105 +176,83 @@ INSERT INTO ChuSoHuu  VALUES
 ('Dang Thi J', '0900123456', 'j@example.com', '189 Đường BCD');
 
 -- Chèn dữ liệu vào bảng PhuongTien
-INSERT INTO PhuongTien  VALUES
-('29A-12345', 'Xe máy', 1, 'Honda', 'Đỏ'),
-('30B-23456', 'Xe ô tô', 2, 'Toyota', 'Trắng'),
-('31C-34567', 'Xe đạp', 3, 'Asama', 'Xanh'),
-('32D-45678', 'Xe máy', 4, 'Yamaha', 'Đen'),
-('33E-56789', 'Xe ô tô', 5, 'Mazda', 'Xám'),
-('34F-67890', 'Xe đạp', 6, 'Martin', 'Vàng'),
-('35G-78901', 'Xe máy', 7, 'Suzuki', 'Hồng'),
-('36H-89012', 'Xe ô tô', 8, 'Kia', 'Xanh'),
-('37I-90123', 'Xe đạp', 9, 'Giant', 'Tím'),
-('38J-01234', 'Xe máy', 10, 'SYM', 'Cam');
+INSERT INTO PhuongTien (BienSoXe, LoaiXe, MaChuSoHuu, MauXe, MauSac) VALUES
+('30A-12345', 'Xe máy', 1, 'Đen', 'Yamaha Exciter'),
+('51C-67890', 'Xe máy', 2, 'Trắng', 'Honda Air Blade'),
+('34D-24680', 'Xe ô tô', 3, 'Đỏ', 'Toyota Vios'),
+('97G-13579', 'Xe ô tô', 4, 'Xanh', 'Honda CR-V'),
+('88H-64201', 'Xe đạp', 5, 'Vàng', 'Asama'),
+('59I-75310', 'Xe đạp', 6, 'Xanh lá cây', 'Panasonic'),
+('22J-86420', 'Xe máy', 7, 'Xanh dương', 'SYM Attila'),
+('93K-97531', 'Xe máy', 8, 'Đen', 'Honda Lead'),
+('64L-48652', 'Xe ô tô', 9, 'Xám', 'Mazda 3'),
+('75M-59763', 'Xe ô tô', 10, 'Nâu', 'Hyundai Elantra');
 
 -- Chèn dữ liệu vào bảng DatCho
-INSERT INTO DatCho  VALUES
-(1, 1, '2023-07-01 08:00:00', '2023-07-01 12:00:00', 'Hoàn thành'),
-(2, 2, '2023-07-02 09:00:00', '2023-07-02 13:00:00', 'Hoàn thành'),
-(3, 3, '2023-07-03 10:00:00', '2023-07-03 14:00:00', 'Hoàn thành'),
-(4, 4, '2023-07-04 11:00:00', '2023-07-04 15:00:00', 'Hoàn thành'),
-(5, 5, '2023-07-05 12:00:00', '2023-07-05 16:00:00', 'Hoàn thành'),
-(6, 6, '2023-07-06 13:00:00', '2023-07-06 17:00:00', 'Hoàn thành'),
-(7, 7, '2023-07-07 14:00:00', '2023-07-07 18:00:00', 'Hoàn thành'),
-(8, 8, '2023-07-08 15:00:00', '2023-07-08 19:00:00', 'Hoàn thành'),
-(9, 9, '2023-07-09 16:00:00', '2023-07-09 20:00:00', 'Hoàn thành'),
-(10, 10, '2023-07-10 17:00:00', '2023-07-10 21:00:00', 'Hoàn thành');
+INSERT INTO DatCho (MaChoDo, MaPhuongTien, ThoiGianBatDau, ThoiGianKetThuc, TrangThai) VALUES
+(1, 1, '2024-07-11 08:00:00', '2024-07-11 09:00:00', 'Đã thanh toán'),
+(2, 2, '2024-07-12 09:00:00', '2024-07-12 10:00:00', 'Chưa thanh toán'),
+(3, 3, '2024-07-13 10:00:00', '2024-07-13 11:00:00', 'Chưa thanh toán'),
+(4, 4, '2024-07-14 11:00:00', '2024-07-14 12:00:00', 'Đã thanh toán'),
+(5, 5, '2024-07-15 12:00:00', '2024-07-15 13:00:00', 'Đã thanh toán');
 
 -- Chèn dữ liệu vào bảng ThanhToan
-INSERT INTO ThanhToan  VALUES
-(1, 50000, '2023-07-01 12:30:00', 'Tiền mặt'),
-(2, 60000, '2023-07-02 13:30:00', 'Thẻ tín dụng'),
-(3, 70000, '2023-07-03 14:30:00', 'Ví điện tử'),
-(4, 80000, '2023-07-04 15:30:00', 'Tiền mặt'),
-(5, 90000, '2023-07-05 16:30:00', 'Thẻ tín dụng'),
-(6, 100000, '2023-07-06 17:30:00', 'Ví điện tử'),
-(7, 110000, '2023-07-07 18:30:00', 'Tiền mặt'),
-(8, 120000, '2023-07-08 19:30:00', 'Thẻ tín dụng'),
-(9, 130000, '2023-07-09 20:30:00', 'Ví điện tử'),
-(10, 140000, '2023-07-10 21:30:00', 'Tiền mặt');
+INSERT INTO ThanhToan (MaDatCho, SoTien, NgayThanhToan, PhuongThucThanhToan) VALUES
+(1, 50000.00, '2024-07-11 09:00:00', 'Tiền mặt'),
+(2, 100000.00, '2024-07-12 10:00:00', 'Chuyển khoản'),
+(3, 150000.00, '2024-07-13 11:00:00', 'Thẻ ngân hàng'),
+(4, 200000.00, '2024-07-14 12:00:00', 'Tiền mặt'),
+(5, 250000.00, '2024-07-15 13:00:00', 'Chuyển khoản');
 
 -- Chèn dữ liệu vào bảng NhanVien
-INSERT INTO NhanVien  VALUES
-('Nguyen Thi A', 'Nhân viên', '0901234561', 'nva@example.com'),
-('Le Van B', 'Quản lý', '0901234562', 'lvb@example.com'),
-('Tran Thi C', 'Nhân viên', '0901234563', 'ttc@example.com'),
-('Pham Van D', 'Nhân viên', '0901234564', 'pvd@example.com'),
-('Hoang Thi E', 'Quản lý', '0901234565', 'hte@example.com'),
-('Bui Van F', 'Nhân viên', '0901234566', 'bvf@example.com'),
-('Do Thi G', 'Nhân viên', '0901234567', 'dtg@example.com'),
-('Vo Van H', 'Nhân viên', '0901234568', 'vvh@example.com'),
-('Vu Thi I', 'Quản lý', '0901234569', 'vti@example.com'),
-('Dang Van J', 'Nhân viên', '0901234570', 'dvj@example.com');
+INSERT INTO NhanVien (TenNhanVien, ChucVu, SoDienThoai, Email) VALUES
+('Nguyen Van Nhan', 'Quản lý', '0909876543', 'nhan@example.com'),
+('Tran Thi Thao', 'Nhân viên', '0908765432', 'thao@example.com'),
+('Hoang Van Hieu', 'Nhân viên', '0907654321', 'hieu@example.com');
 
 -- Chèn dữ liệu vào bảng CaLamViec
-INSERT INTO CaLamViec  VALUES
-(1, '2023-07-01 08:00:00', '2023-07-01 17:00:00'),
-(2, '2023-07-02 08:00:00', '2023-07-02 17:00:00'),
-(3, '2023-07-03 08:00:00', '2023-07-03 17:00:00'),
-(4, '2023-07-04 08:00:00', '2023-07-04 17:00:00'),
-(5, '2023-07-05 08:00:00', '2023-07-05 17:00:00'),
-(6, '2023-07-06 08:00:00', '2023-07-06 17:00:00'),
-(7, '2023-07-07 08:00:00', '2023-07-07 17:00:00'),
-(8, '2023-07-08 08:00:00', '2023-07-08 17:00:00'),
-(9, '2023-07-09 08:00:00', '2023-07-09 17:00:00'),
-(10, '2023-07-10 08:00:00', '2023-07-10 17:00:00');
+INSERT INTO CaLamViec (MaNhanVien, ThoiGianBatDau, ThoiGianKetThuc) VALUES
+(1, '2024-07-11 08:00:00', '2024-07-11 17:00:00'),
+(2, '2024-07-12 08:00:00', '2024-07-12 17:00:00'),
+(3, '2024-07-13 08:00:00', '2024-07-13 17:00:00');
 
 -- Chèn dữ liệu vào bảng Ve
-INSERT INTO Ve  VALUES
-(1, '2023-07-01 08:00:00', '2023-07-01 20:00:00', 'Đã sử dụng'),
-(2, '2023-07-02 08:00:00', '2023-07-02 20:00:00', 'Đã sử dụng'),
-(3, '2023-07-03 08:00:00', '2023-07-03 20:00:00', 'Đã sử dụng'),
-(4, '2023-07-04 08:00:00', '2023-07-04 20:00:00', 'Đã sử dụng'),
-(5, '2023-07-05 08:00:00', '2023-07-05 20:00:00', 'Đã sử dụng'),
-(6, '2023-07-06 08:00:00', '2023-07-06 20:00:00', 'Đã sử dụng'),
-(7, '2023-07-07 08:00:00', '2023-07-07 20:00:00', 'Đã sử dụng'),
-(8, '2023-07-08 08:00:00', '2023-07-08 20:00:00', 'Đã sử dụng'),
-(9, '2023-07-09 08:00:00', '2023-07-09 20:00:00', 'Đã sử dụng'),
-(10, '2023-07-10 08:00:00', '2023-07-10 20:00:00', 'Đã sử dụng');
+INSERT INTO Ve (MaDatCho, NgayPhatHanh, NgayHetHan, TrangThai) VALUES
+(1, '2024-07-11 09:00:00', '2024-07-11 18:00:00', 'Còn hiệu lực'),
+(2, '2024-07-12 10:00:00', '2024-07-12 19:00:00', 'Hết hiệu lực'),
+(3, '2024-07-13 11:00:00', '2024-07-13 20:00:00', 'Còn hiệu lực'),
+(4, '2024-07-14 12:00:00', '2024-07-14 21:00:00', 'Còn hiệu lực'),
+(5, '2024-07-15 13:00:00', '2024-07-15 22:00:00', 'Hết hiệu lực');
 
 -- Chèn dữ liệu vào bảng GiamGia
-INSERT INTO GiamGia  VALUES
-('GG001', 'Giảm giá 10%', 10.00, '2023-12-31'),
-('GG002', 'Giảm giá 20%', 20.00, '2023-12-31'),
-('GG003', 'Giảm giá 30%', 30.00, '2023-12-31'),
-('GG004', 'Giảm giá 40%', 40.00, '2023-12-31'),
-('GG005', 'Giảm giá 50%', 50.00, '2023-12-31'),
-('GG006', 'Giảm giá 60%', 60.00, '2023-12-31'),
-('GG007', 'Giảm giá 70%', 70.00, '2023-12-31'),
-('GG008', 'Giảm giá 80%', 80.00, '2023-12-31'),
-('GG009', 'Giảm giá 90%', 90.00, '2023-12-31'),
-('GG010', 'Giảm giá 100%', 100.00, '2023-12-31');
+INSERT INTO GiamGia (MaGiamGia, MoTa, PhanTramGiam, NgayHetHan) VALUES
+('GG12345', 'Giảm giá 10% cho khách hàng thân thiết', 10.00, '2024-12-31'),
+('GG54321', 'Giảm giá 20% cho khách hàng mới', 20.00, '2024-12-31');
 
 -- Chèn dữ liệu vào bảng ApDungGiamGia
-INSERT INTO ApDungGiamGia  VALUES
-(1, 1, 5000),
-(2, 2, 12000),
-(3, 3, 21000),
-(4, 4, 32000),
-(5, 5, 45000),
-(6, 6, 60000),
-(7, 7, 77000),
-(8, 8, 96000),
-(9, 9, 117000),
-(10, 10, 140000);
+INSERT INTO ApDungGiamGia (IDGiamGia, MaThanhToan, SoTienGiam) VALUES
+(1, 1, 45000.00),
+(2, 2, 80000.00),
+(3, 3, 135000.00),
+(4, 4, 180000.00),
+(5, 5, 225000.00);
+
+-- Chèn dữ liệu vào bảng TaiKhoan
+INSERT INTO TaiKhoan (MaNhanVien, TenDangNhap, MatKhau, LoaiNguoiDung, Email, SoDienThoai) VALUES
+(1, 'quanly1', 'quanly1', 'QuanLy', 'quanly1@example.com', '0901234567'),
+(2, 'nhanvien1', 'nhanvien1', 'NhanVien', 'nhanvien1@example.com', '0902345678'),
+(3, 'nhanvien2', 'nhanvien2', 'NhanVien', 'nhanvien2@example.com', '0903456789');
+
+-- Kiểm tra bảng GiamGia
+SELECT * FROM GiamGia;
+
+-- Nếu cần, xóa dữ liệu không hợp lệ từ bảng ApDungGiamGia trước khi chèn lại
+DELETE FROM ApDungGiamGia;
+
+-- Chèn lại dữ liệu vào bảng ApDungGiamGia
+INSERT INTO ApDungGiamGia (IDGiamGia, MaThanhToan, SoTienGiam) VALUES
+(1, 1, 45000.00),  -- Đảm bảo IDGiamGia=1 tồn tại trong bảng GiamGia
+(2, 2, 80000.00),  -- Đảm bảo IDGiamGia=2 tồn tại trong bảng GiamGia
+(1, 3, 135000.00), -- Đảm bảo IDGiamGia=1 tồn tại trong bảng GiamGia
+(2, 4, 180000.00), -- Đảm bảo IDGiamGia=2 tồn tại trong bảng GiamGia
+(1, 5, 225000.00); -- Đảm bảo IDGiamGia=1 tồn tại trong bảng GiamGia
