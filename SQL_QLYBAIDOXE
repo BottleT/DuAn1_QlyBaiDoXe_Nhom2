@@ -1,258 +1,225 @@
 USE DuAn1_QuanLyBaiDoXe_Nhom2;
 
+drop table Ve
+drop table LoaiVe
+drop table ThanhToan
+drop table BaiDoXe
+
+USE DuAn1_QuanLyBaiDoXe_Nhom2;
+GO
+
+-- Tạo bảng loại vé
+CREATE TABLE LoaiVe(
+    IdLoaiVe INT IDENTITY(1,1) PRIMARY KEY,
+    tenVe nvarchar(30) not null
+);
+
+-- Tạo bảng vé
+CREATE TABLE Ve(
+    IdVe INT IDENTITY(1,1) PRIMARY KEY,
+    IdLoaiVe INT NOT NULL,
+    MaSoVe int not null,
+    NgayTao datetime not null,
+    TrangThai nvarchar(20),
+    Gia decimal(10,2),
+    FOREIGN KEY (IdLoaiVe) REFERENCES LoaiVe(IdLoaiVe)
+);
+
 -- Tạo bảng BaiDoXe
 CREATE TABLE BaiDoXe (
     MaBaiDo INT IDENTITY(1,1) PRIMARY KEY,
     TenBaiDo VARCHAR(100) NOT NULL,
     ViTri VARCHAR(255) NOT NULL,
-    TongSoCho INT NOT NULL,
-    SoChoConLai INT NOT NULL
+    TongSoCho INT NOT NULL
 );
 
--- Tạo bảng ChoDoXe
-CREATE TABLE ChoDoXe (
-    MaChoDo INT IDENTITY(1,1) PRIMARY KEY,
-    MaBaiDo INT,
-    SoCho VARCHAR(50) NOT NULL,
-    CoXe BIT NOT NULL,
-    LoaiCho VARCHAR(50),
-    FOREIGN KEY (MaBaiDo) REFERENCES BaiDoXe(MaBaiDo)
+-- Tạo bảng LichLamViec
+CREATE TABLE LichLamViec(
+    IdLichLam INT IDENTITY(1,1) PRIMARY KEY,
+    IdCaLam INT not null,
+    NgayLamViec datetime not null,
+    MaBaiDoXe int not null,
+    FOREIGN KEY (MaBaiDoXe) REFERENCES BaiDoXe(MaBaiDo)
 );
 
--- Tạo bảng ChuSoHuu
-CREATE TABLE ChuSoHuu (
-    MaChuSoHuu INT IDENTITY(1,1) PRIMARY KEY,
-    TenChuSoHuu VARCHAR(100) NOT NULL,
-    SoDienThoai VARCHAR(15) NOT NULL,
-    Email VARCHAR(100),
-    DiaChi VARCHAR(255)
+-- Tạo bảng TaiKhoan
+CREATE TABLE TaiKhoan(
+    IdTaiKhoan INT IDENTITY(1,1) PRIMARY KEY,
+    IdLichLam INT not null,
+    HoTen Nvarchar(100) not null,
+    UserName Nvarchar(50) not null,
+    PassW Nvarchar(50) not null,
+    Email Nvarchar(100) not null,
+    SoDienThoai Nvarchar(20) not null,
+    ChucVu Nvarchar(20) not null,
+    FOREIGN KEY (IdLichLam) REFERENCES LichLamViec(IdLichLam)
 );
 
 -- Tạo bảng PhuongTien
 CREATE TABLE PhuongTien (
     MaPhuongTien INT IDENTITY(1,1) PRIMARY KEY,
+    IdTaiKhoan INT not Null,
     BienSoXe VARCHAR(50) NOT NULL,
     LoaiXe VARCHAR(50) NOT NULL,
-    MaChuSoHuu INT,
     MauXe VARCHAR(100),
-    MauSac VARCHAR(50),
-    FOREIGN KEY (MaChuSoHuu) REFERENCES ChuSoHuu(MaChuSoHuu)
+    FOREIGN KEY (IdTaiKhoan) REFERENCES TaiKhoan(IdTaiKhoan)
 );
 
--- Tạo bảng DatCho
-CREATE TABLE DatCho (
-    MaDatCho INT IDENTITY(1,1) PRIMARY KEY,
-    MaChoDo INT,
-    MaPhuongTien INT,
-    ThoiGianBatDau DATETIME NOT NULL,
-    ThoiGianKetThuc DATETIME NOT NULL,
-    TrangThai VARCHAR(50),
-    FOREIGN KEY (MaChoDo) REFERENCES ChoDoXe(MaChoDo),
+-- Tạo bảng ChoDoXe
+CREATE TABLE ChoDoXe (
+    MaChoDo INT IDENTITY(1,1) PRIMARY KEY,
+    MaBaiDo INT not null,
+    MaPhuongTien INT not null,
+    SoCho VARCHAR(50) NOT NULL,
+    CoXe BIT NOT NULL,
+    LoaiCho VARCHAR(50),
+    FOREIGN KEY (MaBaiDo) REFERENCES BaiDoXe(MaBaiDo),
     FOREIGN KEY (MaPhuongTien) REFERENCES PhuongTien(MaPhuongTien)
+);
+
+-- Tạo bảng ca làm việc
+CREATE TABLE CaLamViec(
+    IdCaLam INT IDENTITY(1,1) PRIMARY KEY,
+    IdNhanVien INT not null,
+    thoiGianBatDau DateTime not null,
+    thoiGianKetThuc DateTime not null,
+    CongLamViec Nvarchar(10) not null,
+    FOREIGN KEY (IdNhanVien) REFERENCES TaiKhoan(IdTaiKhoan)
 );
 
 -- Tạo bảng ThanhToan
 CREATE TABLE ThanhToan (
     MaThanhToan INT IDENTITY(1,1) PRIMARY KEY,
-    MaDatCho INT,
+    IdLoaiVe INT not null,
     SoTien DECIMAL(10, 2) NOT NULL,
     NgayThanhToan DATETIME NOT NULL,
     PhuongThucThanhToan VARCHAR(50),
-    FOREIGN KEY (MaDatCho) REFERENCES DatCho(MaDatCho)
+    FOREIGN KEY (IdLoaiVe) REFERENCES LoaiVe(IdLoaiVe)
 );
 
--- Tạo bảng NhanVien
-CREATE TABLE NhanVien (
-    MaNhanVien INT IDENTITY(1,1) PRIMARY KEY,
-    TenNhanVien VARCHAR(100) NOT NULL,
-    ChucVu VARCHAR(50) NOT NULL,
-    SoDienThoai VARCHAR(15) NOT NULL,
-    Email VARCHAR(100)
+-- Tạo bảng phương tiện vé
+CREATE TABLE PhuongTienVe(
+    IdPhuongTienVe INT IDENTITY(1,1) PRIMARY KEY,
+    NgayGioVao datetime not null,
+    NgayGioRa datetime not null,
+    MauXe nvarchar(20) not null,
+    MaPhuongTien INT NOT NULL,
+    trangThai nvarchar(20),
+    IdVe INT NOT NULL,
+    FOREIGN KEY (IdVe) REFERENCES Ve(IdVe),
+    FOREIGN KEY (MaPhuongTien) REFERENCES PhuongTien(MaPhuongTien)
 );
 
--- Tạo bảng CaLamViec
-CREATE TABLE CaLamViec (
-    MaCaLamViec INT IDENTITY(1,1) PRIMARY KEY,
-    MaNhanVien INT,
-    ThoiGianBatDau DATETIME NOT NULL,
-    ThoiGianKetThuc DATETIME NOT NULL,
-    FOREIGN KEY (MaNhanVien) REFERENCES NhanVien(MaNhanVien)
-);
+-- thêm dữ liệu
+INSERT INTO LoaiVe (tenVe)
+VALUES (N'Ve tháng'),
+       (N'Ve ngày')
 
--- Tạo bảng Ve
-CREATE TABLE Ve (
-    MaVe INT IDENTITY(1,1) PRIMARY KEY,
-    MaDatCho INT,
-    NgayPhatHanh DATETIME NOT NULL,
-    NgayHetHan DATETIME NOT NULL,
-    TrangThai VARCHAR(50),
-    FOREIGN KEY (MaDatCho) REFERENCES DatCho(MaDatCho)
-);
 
--- Tạo bảng GiamGia
-CREATE TABLE GiamGia (
-    IDGiamGia INT IDENTITY(1,1) PRIMARY KEY,
-    MaGiamGia VARCHAR(50) NOT NULL,
-    MoTa VARCHAR(255),
-    PhanTramGiam DECIMAL(5, 2) NOT NULL,
-    NgayHetHan DATETIME NOT NULL
-);
 
--- Tạo bảng ApDungGiamGia
-CREATE TABLE ApDungGiamGia (
-    MaApDungGiamGia INT IDENTITY(1,1) PRIMARY KEY,
-    IDGiamGia INT,
-    MaThanhToan INT,
-    SoTienGiam DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (IDGiamGia) REFERENCES GiamGia(IDGiamGia),
-    FOREIGN KEY (MaThanhToan) REFERENCES ThanhToan(MaThanhToan)
-);
+INSERT INTO BaiDoXe (TenBaiDo, ViTri, TongSoCho)
+VALUES (N'Bãi đỗ A', N'Tầng 1', 50),
+       (N'Bãi đỗ B', N'Tầng 2', 80),
+       (N'Bãi đỗ C', N'Tầng hầm', 120),
+       (N'Bãi đỗ D', N'Tầng 3', 60),
+       (N'Bãi đỗ E', N'Tầng 4', 70),
+       (N'Bãi đỗ F', N'Tầng 5', 90),
+       (N'Bãi đỗ G', N'Tầng 6', 100),
+       (N'Bãi đỗ H', N'Tầng 7', 110),
+       (N'Bãi đỗ I', N'Tầng 8', 80),
+       (N'Bãi đỗ K', N'Tầng 9', 60);
 
--- Tạo bảng TaiKhoan
-CREATE TABLE TaiKhoan (
-    MaTaiKhoan INT IDENTITY(1,1) PRIMARY KEY,
-    MaNhanVien INT,
-    TenDangNhap VARCHAR(50) NOT NULL,
-    MatKhau VARCHAR(50) NOT NULL,
-    LoaiNguoiDung VARCHAR(20) CHECK (LoaiNguoiDung IN ('NhanVien', 'QuanLy')),
-    Email VARCHAR(100),
-    SoDienThoai VARCHAR(15) NOT NULL,
-    FOREIGN KEY (MaNhanVien) REFERENCES NhanVien(MaNhanVien)
-);
+INSERT INTO LichLamViec (IdCaLam, NgayLamViec, MaBaiDoXe)
+VALUES (1, GETDATE(), 1),
+       (2, GETDATE(), 2),
+       (3, GETDATE(), 3),
+       (4, GETDATE(), 4),
+       (5, GETDATE(), 5),
+       (6, GETDATE(), 6),
+       (7, GETDATE(), 7),
+       (8, GETDATE(), 8),
+       (9, GETDATE(), 9),
+       (10, GETDATE(), 10);
 
--- Tạo ràng buộc kiểm tra cho số điện thoại
-ALTER TABLE TaiKhoan
-ADD CONSTRAINT CHK_SoDienThoai_VietNam 
-CHECK (
-    -- Số điện thoại bắt đầu bằng '0' hoặc '+84'
-    (SoDienThoai LIKE '0%' OR SoDienThoai LIKE '+84%') 
-    AND
-    -- Độ dài từ 10 đến 11 ký tự (loại bỏ ký tự '+')
-    LEN(REPLACE(SoDienThoai, '+', '')) BETWEEN 10 AND 11
-);
+INSERT INTO TaiKhoan (IdLichLam, HoTen, UserName, PassW, Email, SoDienThoai, ChucVu)
+VALUES (1, N'Nguyễn Văn A', N'user1', N'password1', N'user1@example.com', N'0987654321', N'Quản lý'),
+       (2, N'Nguyễn Thị B', N'user2', N'password2', N'user2@example.com', N'0987654322', N'Nhân viên'),
+       (3, N'Trần Văn C', N'user3', N'password3', N'user3@example.com', N'0987654323', N'Nhân viên'),
+       (4, N'Lê Thị D', N'user4', N'password4', N'user4@example.com', N'0987654324', N'Nhân viên'),
+       (5, N'Phạm Văn E', N'user5', N'password5', N'user5@example.com', N'0987654325', N'Nhân viên'),
+       (6, N'Hồ Thị F', N'user6', N'password6', N'user6@example.com', N'0987654326', N'Nhân viên'),
+       (7, N'Mai Văn G', N'user7', N'password7', N'user7@example.com', N'0987654327', N'Nhân viên'),
+       (8, N'Vũ Thị H', N'user8', N'password8', N'user8@example.com', N'0987654328', N'Nhân viên'),
+       (9, N'Đỗ Văn I', N'user9', N'password9', N'user9@example.com', N'0987654329', N'Nhân viên'),
+       (10, N'Ngô Thị K', N'user10', N'password10', N'user10@example.com', N'0987654330', N'Nhân viên');
 
--- Tạo ràng buộc kiểm tra cho email
-ALTER TABLE TaiKhoan
-ADD CONSTRAINT CHK_Email_Format 
-CHECK (Email LIKE '%@%.%' AND LEN(Email) <= 100);
+INSERT INTO PhuongTien (IdTaiKhoan, BienSoXe, LoaiXe, MauXe)
+VALUES (1, N'29A-12345', N'Ô tô', N'Do'),
+       (2, N'51B-67890', N'Xe máy', N'Xanh'),
+       (3, N'30H-98765', N'Ô tô', N'Trắng'),
+       (4, N'56K-54321', N'Xe máy', N'Vàng'),
+       (5, N'78C-24680', N'Ô tô', N'Xám'),
+       (6, N'99X-13579', N'Xe máy', N'Nâu'),
+       (7, N'88Y-97531', N'Ô tô', N'Đen'),
+       (8, N'22Z-86420', N'Xe máy', N'Trắng'),
+       (9, N'07P-45678', N'Ô tô', N'Đen'),
+       (10, N'63Q-98765', N'Xe máy', N'Đỏ');
 
--- Chèn dữ liệu vào bảng BaiDoXe
-INSERT INTO BaiDoXe (TenBaiDo, ViTri, TongSoCho, SoChoConLai) VALUES
-('Bãi A', '123 Đường ABC', 100, 50),
-('Bãi B', '456 Đường DEF', 150, 75),
-('Bãi C', '789 Đường GHI', 200, 100),
-('Bãi D', '101 Đường JKL', 250, 125),
-('Bãi E', '112 Đường MNO', 300, 150),
-('Bãi F', '134 Đường PQR', 350, 175),
-('Bãi G', '145 Đường STU', 400, 200),
-('Bãi H', '167 Đường VWX', 450, 225),
-('Bãi I', '178 Đường YZA', 500, 250),
-('Bãi J', '189 Đường BCD', 550, 275);
+INSERT INTO ChoDoXe (MaBaiDo, MaPhuongTien, SoCho, CoXe, LoaiCho)
+VALUES (1, 1, N'1A, 1B', 1, N'Cho thường'),
+       (2, 2, N'2A, 2B', 1, N'Cho VIP'),
+       (3, 3, N'3A, 3B', 1, N'Cho thường'),
+       (4, 4, N'4A, 4B', 1, N'Cho VIP'),
+       (5, 5, N'5A, 5B', 1, N'Cho thường'),
+       (6, 6, N'6A, 6B', 1, N'Cho thường'),
+       (7, 7, N'7A, 7B', 1, N'Cho VIP'),
+       (8, 8, N'8A, 8B', 1, N'Cho thường'),
+       (9, 9, N'9A, 9B', 1, N'Cho thường'),
+       (10, 10, N'10A, 10B', 1, N'Cho VIP');
 
--- Chèn dữ liệu vào bảng ChoDoXe
-INSERT INTO ChoDoXe (MaBaiDo, SoCho, CoXe, LoaiCho) VALUES
-(1, 'A1', 0, 'Xe máy'),
-(1, 'A2', 1, 'Xe máy'),
-(2, 'B1', 0, 'Xe ô tô'),
-(2, 'B2', 1, 'Xe ô tô'),
-(3, 'C1', 0, 'Xe đạp'),
-(3, 'C2', 1, 'Xe đạp'),
-(4, 'D1', 0, 'Xe máy'),
-(4, 'D2', 1, 'Xe máy'),
-(5, 'E1', 0, 'Xe ô tô'),
-(5, 'E2', 1, 'Xe ô tô');
+INSERT INTO CaLamViec (IdNhanVien, thoiGianBatDau, thoiGianKetThuc, CongLamViec)
+VALUES (1, DATEADD(HOUR, -8, GETDATE()), DATEADD(HOUR, 16, GETDATE()), N'Tầng 1'),
+       (2, DATEADD(HOUR, -7, GETDATE()), DATEADD(HOUR, 15, GETDATE()), N'Tầng 2'),
+       (3, DATEADD(HOUR, -6, GETDATE()), DATEADD(HOUR, 14, GETDATE()), N'Tầng 3'),
+       (4, DATEADD(HOUR, -5, GETDATE()), DATEADD(HOUR, 13, GETDATE()), N'Tầng 4'),
+       (5, DATEADD(HOUR, -4, GETDATE()), DATEADD(HOUR, 12, GETDATE()), N'Tầng hầm'),
+       (6, DATEADD(HOUR, -3, GETDATE()), DATEADD(HOUR, 11, GETDATE()), N'Tầng 5'),
+       (7, DATEADD(HOUR, -2, GETDATE()), DATEADD(HOUR, 10, GETDATE()), N'Tầng 6'),
+       (8, DATEADD(HOUR, -1, GETDATE()), DATEADD(HOUR, 9, GETDATE()), N'Tầng 7'),
+       (9, DATEADD(HOUR, -9, GETDATE()), DATEADD(HOUR, 17, GETDATE()), N'Tầng 8'),
+       (10, DATEADD(HOUR, -10, GETDATE()), DATEADD(HOUR, 18, GETDATE()), N'Tầng 9');
 
--- Chèn dữ liệu vào bảng ChuSoHuu
-INSERT INTO ChuSoHuu (TenChuSoHuu, SoDienThoai, Email, DiaChi) VALUES
-('Nguyen Van A', '0901234567', 'a@example.com', '123 Đường ABC'),
-('Le Thi B', '0902345678', 'b@example.com', '456 Đường DEF'),
-('Tran Van C', '0903456789', 'c@example.com', '789 Đường GHI'),
-('Pham Thi D', '0904567890', 'd@example.com', '101 Đường JKL'),
-('Hoang Van E', '0905678901', 'e@example.com', '112 Đường MNO'),
-('Bui Thi F', '0906789012', 'f@example.com', '134 Đường PQR'),
-('Do Van G', '0907890123', 'g@example.com', '145 Đường STU'),
-('Vo Thi H', '0908901234', 'h@example.com', '167 Đường VWX'),
-('Vu Van I', '0909012345', 'i@example.com', '178 Đường YZA'),
-('Dang Thi J', '0900123456', 'j@example.com', '189 Đường BCD');
+INSERT INTO ThanhToan (IdLoaiVe, SoTien, NgayThanhToan, PhuongThucThanhToan)
+VALUES (1, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -1, GETDATE()), N'Tiền mặt'),
+       (2, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -2, GETDATE()), N'Tiền mặt'),
+       (2, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -3, GETDATE()), N'Tiền mặt'),
+       (1, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -4, GETDATE()), N'Tiền mặt'),
+       (2, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -5, GETDATE()), N'Tiền mặt'),
+       (1, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -6, GETDATE()), N'Tiền mặt'),
+       (1, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -7, GETDATE()), N'Tiền mặt'),
+       (1, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -8, GETDATE()), N'Tiền mặt'),
+       (2, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -9, GETDATE()), N'Tiền mặt'),
+       (2, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -10, GETDATE()), N'Tiền mặt');
 
--- Chèn dữ liệu vào bảng PhuongTien
-INSERT INTO PhuongTien (BienSoXe, LoaiXe, MaChuSoHuu, MauXe, MauSac) VALUES
-('30A-12345', 'Xe máy', 1, 'Đen', 'Yamaha Exciter'),
-('51C-67890', 'Xe máy', 2, 'Trắng', 'Honda Air Blade'),
-('34D-24680', 'Xe ô tô', 3, 'Đỏ', 'Toyota Vios'),
-('97G-13579', 'Xe ô tô', 4, 'Xanh', 'Honda CR-V'),
-('88H-64201', 'Xe đạp', 5, 'Vàng', 'Asama'),
-('59I-75310', 'Xe đạp', 6, 'Xanh lá cây', 'Panasonic'),
-('22J-86420', 'Xe máy', 7, 'Xanh dương', 'SYM Attila'),
-('93K-97531', 'Xe máy', 8, 'Đen', 'Honda Lead'),
-('64L-48652', 'Xe ô tô', 9, 'Xám', 'Mazda 3'),
-('75M-59763', 'Xe ô tô', 10, 'Nâu', 'Hyundai Elantra');
-
--- Chèn dữ liệu vào bảng DatCho
-INSERT INTO DatCho (MaChoDo, MaPhuongTien, ThoiGianBatDau, ThoiGianKetThuc, TrangThai) VALUES
-(1, 1, '2024-07-11 08:00:00', '2024-07-11 09:00:00', 'Đã thanh toán'),
-(2, 2, '2024-07-12 09:00:00', '2024-07-12 10:00:00', 'Chưa thanh toán'),
-(3, 3, '2024-07-13 10:00:00', '2024-07-13 11:00:00', 'Chưa thanh toán'),
-(4, 4, '2024-07-14 11:00:00', '2024-07-14 12:00:00', 'Đã thanh toán'),
-(5, 5, '2024-07-15 12:00:00', '2024-07-15 13:00:00', 'Đã thanh toán');
-
--- Chèn dữ liệu vào bảng ThanhToan
-INSERT INTO ThanhToan (MaDatCho, SoTien, NgayThanhToan, PhuongThucThanhToan) VALUES
-(1, 50000.00, '2024-07-11 09:00:00', 'Tiền mặt'),
-(2, 100000.00, '2024-07-12 10:00:00', 'Chuyển khoản'),
-(3, 150000.00, '2024-07-13 11:00:00', 'Thẻ ngân hàng'),
-(4, 200000.00, '2024-07-14 12:00:00', 'Tiền mặt'),
-(5, 250000.00, '2024-07-15 13:00:00', 'Chuyển khoản');
-
--- Chèn dữ liệu vào bảng NhanVien
-INSERT INTO NhanVien (TenNhanVien, ChucVu, SoDienThoai, Email) VALUES
-('Nguyen Van Nhan', 'Quản lý', '0909876543', 'nhan@example.com'),
-('Tran Thi Thao', 'Nhân viên', '0908765432', 'thao@example.com'),
-('Hoang Van Hieu', 'Nhân viên', '0907654321', 'hieu@example.com');
-
--- Chèn dữ liệu vào bảng CaLamViec
-INSERT INTO CaLamViec (MaNhanVien, ThoiGianBatDau, ThoiGianKetThuc) VALUES
-(1, '2024-07-11 08:00:00', '2024-07-11 17:00:00'),
-(2, '2024-07-12 08:00:00', '2024-07-12 17:00:00'),
-(3, '2024-07-13 08:00:00', '2024-07-13 17:00:00');
-
--- Chèn dữ liệu vào bảng Ve
-INSERT INTO Ve (MaDatCho, NgayPhatHanh, NgayHetHan, TrangThai) VALUES
-(1, '2024-07-11 09:00:00', '2024-07-11 18:00:00', 'Còn hiệu lực'),
-(2, '2024-07-12 10:00:00', '2024-07-12 19:00:00', 'Hết hiệu lực'),
-(3, '2024-07-13 11:00:00', '2024-07-13 20:00:00', 'Còn hiệu lực'),
-(4, '2024-07-14 12:00:00', '2024-07-14 21:00:00', 'Còn hiệu lực'),
-(5, '2024-07-15 13:00:00', '2024-07-15 22:00:00', 'Hết hiệu lực');
-
--- Chèn dữ liệu vào bảng GiamGia
-INSERT INTO GiamGia (MaGiamGia, MoTa, PhanTramGiam, NgayHetHan) VALUES
-('GG12345', 'Giảm giá 10% cho khách hàng thân thiết', 10.00, '2024-12-31'),
-('GG54321', 'Giảm giá 20% cho khách hàng mới', 20.00, '2024-12-31');
-
--- Chèn dữ liệu vào bảng ApDungGiamGia
-INSERT INTO ApDungGiamGia (IDGiamGia, MaThanhToan, SoTienGiam) VALUES
-(1, 1, 45000.00),
-(2, 2, 80000.00),
-(3, 3, 135000.00),
-(4, 4, 180000.00),
-(5, 5, 225000.00);
-
--- Chèn dữ liệu vào bảng TaiKhoan
-INSERT INTO TaiKhoan (MaNhanVien, TenDangNhap, MatKhau, LoaiNguoiDung, Email, SoDienThoai) VALUES
-(1, 'quanly1', 'quanly1', 'QuanLy', 'quanly1@example.com', '0901234567'),
-(2, 'nhanvien1', 'nhanvien1', 'NhanVien', 'nhanvien1@example.com', '0902345678'),
-(3, 'nhanvien2', 'nhanvien2', 'NhanVien', 'nhanvien2@example.com', '0903456789');
-
--- Kiểm tra bảng GiamGia
-SELECT * FROM GiamGia;
-
--- Nếu cần, xóa dữ liệu không hợp lệ từ bảng ApDungGiamGia trước khi chèn lại
-DELETE FROM ApDungGiamGia;
-
--- Chèn lại dữ liệu vào bảng ApDungGiamGia
-INSERT INTO ApDungGiamGia (IDGiamGia, MaThanhToan, SoTienGiam) VALUES
-(1, 1, 45000.00),  -- Đảm bảo IDGiamGia=1 tồn tại trong bảng GiamGia
-(2, 2, 80000.00),  -- Đảm bảo IDGiamGia=2 tồn tại trong bảng GiamGia
-(1, 3, 135000.00), -- Đảm bảo IDGiamGia=1 tồn tại trong bảng GiamGia
-(2, 4, 180000.00), -- Đảm bảo IDGiamGia=2 tồn tại trong bảng GiamGia
-(1, 5, 225000.00); -- Đảm bảo IDGiamGia=1 tồn tại trong bảng GiamGia
+INSERT INTO PhuongTienVe (NgayGioVao, NgayGioRa, MauXe, MaPhuongTien, trangThai, IdVe)
+VALUES (DATEADD(HOUR, -1, GETDATE()), GETDATE(), N'Do', 1, N'chưa thanh toán', 22),
+       (DATEADD(HOUR, -2, GETDATE()), GETDATE(), N'Xanh', 2, N'chưa thanh toán', 23),
+       (DATEADD(HOUR, -3, GETDATE()), GETDATE(), N'Trắng', 3, N'chưa thanh toán', 24),
+       (DATEADD(HOUR, -4, GETDATE()), GETDATE(), N'Vàng', 4, N'chưa thanh toán', 25),
+       (DATEADD(HOUR, -5, GETDATE()), GETDATE(), N'Xám', 5, N'chưa thanh toán', 26),
+       (DATEADD(HOUR, -6, GETDATE()), GETDATE(), N'Nâu', 6, N'chưa thanh toán', 27),
+       (DATEADD(HOUR, -7, GETDATE()), GETDATE(), N'Đen', 7, N'chưa thanh toán', 28),
+       (DATEADD(HOUR, -8, GETDATE()), GETDATE(), N'Trắng', 8, N'chưa thanh toán', 29),
+       (DATEADD(HOUR, -9, GETDATE()), GETDATE(), N'Đen', 9, N'chưa thanh toán', 30),
+       (DATEADD(HOUR, -10, GETDATE()), GETDATE(), N'Đỏ', 10, N'chưa thanh toán', 31);
+INSERT INTO Ve (IdLoaiVe, MaSoVe, NgayTao, TrangThai, Gia)
+VALUES (1, 1001, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (2, 1002, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (1, 1003, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (2, 1004, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (1, 1005, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (2, 1006, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (2, 1007, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (1, 1008, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (1, 1009, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
+       (1, 1010, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2)));
