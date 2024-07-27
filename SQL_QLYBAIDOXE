@@ -1,12 +1,6 @@
-USE DuAn1_QuanLyBaiDoXe_Nhom2;
-
-drop table Ve
-drop table LoaiVe
-drop table ThanhToan
-drop table BaiDoXe
+CREATE DATABASE DuAn1_QuanLyBaiDoXe_Nhom2;
 
 USE DuAn1_QuanLyBaiDoXe_Nhom2;
-GO
 
 -- Tạo bảng loại vé
 CREATE TABLE LoaiVe(
@@ -202,16 +196,16 @@ VALUES (1, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -1, GET
        (2, CAST(RAND() * (100 - 50) + 50 AS DECIMAL(10,2)), DATEADD(DAY, -10, GETDATE()), N'Tiền mặt');
 
 INSERT INTO PhuongTienVe (NgayGioVao, NgayGioRa, MauXe, MaPhuongTien, trangThai, IdVe)
-VALUES (DATEADD(HOUR, -1, GETDATE()), GETDATE(), N'Do', 1, N'chưa thanh toán', 22),
-       (DATEADD(HOUR, -2, GETDATE()), GETDATE(), N'Xanh', 2, N'chưa thanh toán', 23),
-       (DATEADD(HOUR, -3, GETDATE()), GETDATE(), N'Trắng', 3, N'chưa thanh toán', 24),
-       (DATEADD(HOUR, -4, GETDATE()), GETDATE(), N'Vàng', 4, N'chưa thanh toán', 25),
-       (DATEADD(HOUR, -5, GETDATE()), GETDATE(), N'Xám', 5, N'chưa thanh toán', 26),
-       (DATEADD(HOUR, -6, GETDATE()), GETDATE(), N'Nâu', 6, N'chưa thanh toán', 27),
-       (DATEADD(HOUR, -7, GETDATE()), GETDATE(), N'Đen', 7, N'chưa thanh toán', 28),
-       (DATEADD(HOUR, -8, GETDATE()), GETDATE(), N'Trắng', 8, N'chưa thanh toán', 29),
-       (DATEADD(HOUR, -9, GETDATE()), GETDATE(), N'Đen', 9, N'chưa thanh toán', 30),
-       (DATEADD(HOUR, -10, GETDATE()), GETDATE(), N'Đỏ', 10, N'chưa thanh toán', 31);
+VALUES (DATEADD(HOUR, -1, GETDATE()), GETDATE(), N'Do', 1, N'chưa thanh toán', 1),
+       (DATEADD(HOUR, -2, GETDATE()), GETDATE(), N'Xanh', 2, N'chưa thanh toán', 2),
+       (DATEADD(HOUR, -3, GETDATE()), GETDATE(), N'Trắng', 3, N'chưa thanh toán', 3),
+       (DATEADD(HOUR, -4, GETDATE()), GETDATE(), N'Vàng', 4, N'chưa thanh toán', 4),
+       (DATEADD(HOUR, -5, GETDATE()), GETDATE(), N'Xám', 5, N'chưa thanh toán', 5),
+       (DATEADD(HOUR, -6, GETDATE()), GETDATE(), N'Nâu', 6, N'chưa thanh toán', 6),
+       (DATEADD(HOUR, -7, GETDATE()), GETDATE(), N'Đen', 7, N'chưa thanh toán', 7),
+       (DATEADD(HOUR, -8, GETDATE()), GETDATE(), N'Trắng', 8, N'chưa thanh toán', 8),
+       (DATEADD(HOUR, -9, GETDATE()), GETDATE(), N'Đen', 9, N'chưa thanh toán', 9),
+       (DATEADD(HOUR, -10, GETDATE()), GETDATE(), N'Đỏ', 10, N'chưa thanh toán', 10);
 INSERT INTO Ve (IdLoaiVe, MaSoVe, NgayTao, TrangThai, Gia)
 VALUES (1, 1001, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
        (2, 1002, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
@@ -223,3 +217,6 @@ VALUES (1, 1001, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) +
        (1, 1008, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
        (1, 1009, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2))),
        (1, 1010, GETDATE(), N'chưa thanh toán', CAST(RAND() * (10000 - 3000) + 3000 AS DECIMAL(10,2)));
+
+	   SELECT * FROM PhuongTienVe
+	   select * from Ve
